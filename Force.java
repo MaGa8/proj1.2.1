@@ -1,3 +1,4 @@
+
 /**
  * modifier class modeling a force
  * modifies acceleration vector when applied to it

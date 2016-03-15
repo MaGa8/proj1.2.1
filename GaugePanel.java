@@ -19,6 +19,16 @@ public class GaugePanel extends JPanel
 		return ((mMax - mMin) / noIncrements);
 	}
 	
+	/**
+	 * @return true if value is equal to minimum value
+	 */
+	public boolean isMin() { return (mVal == mMin); }
+	
+	/**
+	 * @return true if value is equal to maximum value
+	 */
+	public boolean isMax() { return (mVal == mMax); }
+	
 	public void increase (double amount)
 	{
 		if (mVal + amount > mMax)

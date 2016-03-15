@@ -21,6 +21,11 @@ public class Ball
 	}
 	
 	/**
+	 * @return internal position vector
+	 */
+	public Vector getPosition() { return mPosition; }
+	
+	/**
 	 * @return ball's mass
 	 */
 	public double getMass() { return mMass; }
