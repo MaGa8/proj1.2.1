@@ -164,6 +164,20 @@ public class Vector
 	}
 	
 	/**
+	 * @param v vector to compare to
+	 * @return true if v and this vector have same coordinates
+	 */
+	public boolean equals (Vector v)
+	{
+		for (int cDim = 1; cDim < getDimension() - 1; ++cDim)
+		{
+			if (!compareEpsilon (this.getCoordinate (cDim), v.getCoordinate (cDim)))
+				return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * @param add position to add to current one
 	 */
 	public void move (Vector add)
