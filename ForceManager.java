@@ -1,8 +1,29 @@
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
+import javax.swing.Timer;
+import javax.swing.event.*;
 
+/**
+ * class applying forces to an object given its position and mass
+ * moves object's position regularly according to time interval
+ * @author martin
+ */
 public class ForceManager 
 {
+	public static final double DEFAULT_FRICTION_COEFFICIENT = 0.0;
+	
+	public class MoveListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e) 
+		{
+			applyForce (getFriction());
+			mAcc.apply (mVeloc.getVelocity(), mUpdateInterval);
+			mVeloc.apply (mPos, mUpdateInterval);
+		}
+	}
 	
 	/**
 	 * @param pos position reference to update
@@ -13,8 +34,46 @@ public class ForceManager
 		mVeloc = new Velocity (new Vector (pos.getDimension()));
 		mPos = pos;
 		mMass = mass;
+		mFrictionCoefficient = DEFAULT_FRICTION_COEFFICIENT;
+		mUpdateInterval = 1;
+		mTimer = null;
 	}
 	
+	/**
+	 * @return friction proportional by current friction coefficient to
+	 * the force moving the object
+	 */
+	public Force getFriction()
+	{
+		Vector fric = mAcc.getAcceleration().getOppositeVector();
+		fric.scale (mMass * mFrictionCoefficient);
+		return new Force (fric);
+	}
+	
+	/**
+	 * @return true if velocity is zero
+	 */
+	public boolean isStill()
+	{
+		return (mVeloc.getVelocity().equals (new Vector (mPos.getDimension())));
+	}
+	
+	/**
+	 * @param newUpdateInterval set update interval to be applied once a force is applied
+	 * Precondition the object is not moving
+	 */
+	public void setUpdateInterval (int newUpdateInterval)
+	{
+		if (mTimer != null)
+			throw new IllegalStateException();
+		mUpdateInterval = newUpdateInterval;
+	}
+	
+	/**
+	 * @param forces set of forces to apply
+	 * changes the acceleration of the object and starts
+	 * process of regular movement
+	 */
 	public void applyForces (Collection<Force> forces)
 	{
 		Vector resultingForce = new Vector (mPos.getDimension());
@@ -24,18 +83,40 @@ public class ForceManager
 	}
 	
 	/**
-	 * updates acceleration, velocity and position
+	 * updates acceleration and starts or stops timer if necessary
 	 */
 	public void applyForce (Force f)
 	{
-		double hardcodeTimeInterval = 1;
 		f.apply (mAcc.getAcceleration(), mMass);
-		mAcc.apply (mVeloc.getVelocity(), hardcodeTimeInterval);
-		mVeloc.apply (mPos, hardcodeTimeInterval);
+		if (mTimer == null)
+			resetTimer();
+	}
+	
+	/**
+	 * @param newFrictionCoefficient new friction coefficient
+	 * sets newFrictionCoefficient
+	 */
+	public void setFriction (double newFrictionCoefficient)
+	{
+		mFrictionCoefficient = newFrictionCoefficient;
+	}
+	
+	
+	private void resetTimer()
+	{
+		if (mTimer != null)
+			mTimer.stop();
+		if (!isStill())
+			mTimer = new Timer (mUpdateInterval, new MoveListener());
+		else
+			mTimer = null;
 	}
 	
 	public Acceleration mAcc;
 	public Velocity mVeloc;
 	public Vector mPos;
-	public double mMass;
+	public double mMass, mFrictionCoefficient;
+	int mUpdateInterval;
+	
+	public Timer mTimer;
 }

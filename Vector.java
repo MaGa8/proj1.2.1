@@ -63,9 +63,9 @@ public class Vector
 	 */
 	public Vector (int dim)
 	{
-		mPos = new ArrayList<>();
+		mStore = new ArrayList<>();
 		for (int cDim = 0; cDim < dim; ++cDim)
-			mPos.add (new Double (0.0));
+			mStore.add (new Double (0.0));
 	}
 	
 	/**
@@ -74,7 +74,7 @@ public class Vector
 	 */
 	public Vector (ArrayList<Double> pos)
 	{
-		mPos = pos;
+		mStore = pos;
 	}
 	
 	/**
@@ -85,7 +85,7 @@ public class Vector
 	{
 		ArrayList<Double> coords = new ArrayList<>();
 		for (int cDim = 0; cDim < getDimension(); ++cDim)
-			coords.add (new Double (mPos.get (cDim)));
+			coords.add (new Double (mStore.get (cDim)));
 		return new Vector (coords);
 	}
 	
@@ -103,19 +103,19 @@ public class Vector
 	/**
 	 * @return internal array list used to store position
 	 */
-	public ArrayList<Double> getCoordinates() { return mPos; }
+	public ArrayList<Double> getCoordinates() { return mStore; }
 	
 	/**
 	 * @param index index of coordinate to retrieve
 	 * @return coordinate at index
 	 * Precondition: 
 	 */
-	public double getCoordinate (int index) { return mPos.get (index); }
+	public double getCoordinate (int index) { return mStore.get (index); }
 	
 	/**
 	 * @return dimension of point (number of coordinates)
 	 */
-	public int getDimension() { return mPos.size(); }
+	public int getDimension() { return mStore.size(); }
 	
 	/**
 	 * @param v vector to compare to this vector
@@ -198,9 +198,18 @@ public class Vector
 	{
 		if (index < 0 || index >= getDimension())
 			throw new IllegalIndexException ("inex " + index + " is " + (index < 0 ? " less than zero " : " too large"));
-		mPos.set (index, round (mPos.get (index) + value));
+		mStore.set (index, round (mStore.get (index) + value));
 	}
 	
+	/**
+	 * @param scalar scalar to apply
+	 * scales the vector by given scalar
+	 */
+	public void scale (double scalar)
+	{
+		for (int cDim = 0; cDim < getDimension(); ++cDim)
+			move (cDim, getCoordinate (cDim) * (scalar - 1));
+	}
 	
-	private ArrayList<Double> mPos;
+	private ArrayList<Double> mStore;
 }
