@@ -94,9 +94,9 @@ public class Vector
 	 */
 	public Vector getOppositeVector()
 	{
-		ArrayList<Double> negValues = new ArrayList<>();
+		ArrayList<Double> negValues = new ArrayList<> ();
 		for (int cDim = 0; cDim < getDimension(); ++cDim)
-			negValues.set (cDim, -getCoordinate (cDim));
+			negValues.add (-getCoordinate (cDim));
 		return new Vector (negValues);
 	}
 	
@@ -134,7 +134,8 @@ public class Vector
 				return false;
 			double newScalar = this.getCoordinate (cDim) / v.getCoordinate (cDim);
 			//different ratio
-			if (!compareEpsilon (scalar, newScalar))
+			if ((v.getCoordinate (cDim) != 0.0 && !compareEpsilon (scalar, newScalar)) || 
+				(v.getCoordinate (cDim) == 0.0 && this.getCoordinate (cDim) != 0.0))
 				return false;
 		}
 		return true;
@@ -157,7 +158,8 @@ public class Vector
 				return false;
 			double newScalar = -this.getCoordinate (cDim) / v.getCoordinate (cDim);
 			//different ratio
-			if (!compareEpsilon (scalar, newScalar))
+			if ((v.getCoordinate (cDim) != 0.0 && !compareEpsilon (scalar, newScalar)) ||
+				(v.getCoordinate (cDim) == 0.0 && this.getCoordinate (cDim) != 0.0))
 				return false;
 		}
 		return true;
@@ -169,7 +171,7 @@ public class Vector
 	 */
 	public boolean equals (Vector v)
 	{
-		for (int cDim = 1; cDim < getDimension() - 1; ++cDim)
+		for (int cDim = 0; cDim < getDimension() - 1; ++cDim)
 		{
 			if (!compareEpsilon (this.getCoordinate (cDim), v.getCoordinate (cDim)))
 				return false;
