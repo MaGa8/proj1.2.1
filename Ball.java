@@ -5,15 +5,30 @@
  */
 public class Ball 
 {
+	public final static double FRICTION_COEFFICIENT = 0.075;
+	
+	
 	/**
 	 * @param initPos initial position
 	 */
-	public Ball (Vector initPos)
+	public Ball (Vector initPos, double radius, double density)
 	{
 		mPosition = initPos;
 		mVelocity = new Velocity (new Vector (initPos.getDimension()));
 		mAcceleration = new Acceleration (new Vector (initPos.getDimension()));
+		mRadius = radius;
+		mMass = 4 / 3 * Math.pow(mRadius, 3) * Math.PI * density;
 	}
+	
+	/**
+	 * @return ball's mass
+	 */
+	public double getMass() { return mMass; }
+	
+	/**
+	 * @return radius of the ball
+	 */
+	public double getRadius() { return mRadius; }
 	
 	/**
 	 * moves the ball by one tick in time
@@ -39,5 +54,5 @@ public class Ball
 	private Vector mPosition; 
 	private Velocity mVelocity;
 	private Acceleration mAcceleration;
-	private double mMass = 1;
+	private double mMass, mRadius;
 }

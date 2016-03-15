@@ -46,9 +46,9 @@ public class Vector
 	 * @param pos set of coordinates to use for initialization
 	 * Note: pos is not cloned
 	 */
-	public Vector (ArrayList<Double> pos)
+	public Vector (Double[] pos)
 	{
-		mPos = pos;
+		mPos = new ArrayList<> (Arrays.asList (pos));
 	}
 	
 	/**
@@ -60,7 +60,7 @@ public class Vector
 		ArrayList<Double> coords = new ArrayList<>();
 		for (int cDim = 0; cDim < getDimension(); ++cDim)
 			coords.add (new Double (mPos.get (cDim)));
-		return new Vector (coords);
+		return new Vector ((Double[]) coords.toArray());
 	}
 	
 	/**
