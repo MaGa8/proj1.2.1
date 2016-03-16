@@ -19,9 +19,9 @@ public class ForceManager
 		@Override
 		public void actionPerformed(ActionEvent e) 
 		{
-			applyForce (getFriction());
 			mAcc.apply (mVeloc.getVelocity(), mUpdateInterval);
 			mVeloc.apply (mPos, mUpdateInterval);
+			applyForce (getFriction());
 		}
 	}
 	
@@ -36,7 +36,8 @@ public class ForceManager
 		mMass = mass;
 		mFrictionCoefficient = DEFAULT_FRICTION_COEFFICIENT;
 		mUpdateInterval = 1;
-		mTimer = null;
+		mTimer = new Timer (mUpdateInterval, new MoveListener());
+		mTimer.setRepeats (true);
 	}
 	
 	/**
@@ -63,7 +64,7 @@ public class ForceManager
 	 */
 	public boolean isAccelerating()
 	{
-		return (mAcc.getAcceleration().equals (new Vector (mPos.getDimension())));
+		return (!mAcc.getAcceleration().equals (new Vector (mPos.getDimension())));
 	}
 	
 	/**
@@ -96,8 +97,7 @@ public class ForceManager
 	public void applyForce (Force f)
 	{
 		f.apply (mAcc.getAcceleration(), mMass);
-		if (mTimer == null)
-			resetTimer();
+		resetTimer();
 	}
 	
 	/**
@@ -112,13 +112,10 @@ public class ForceManager
 	
 	private void resetTimer()
 	{
-		if (mTimer != null && isStill())
-		{
+		if (mTimer.isRunning() && isStill())
 			mTimer.stop();
-			mTimer = null;
-		}
-		else if (isAccelerating())
-			mTimer = new Timer (mUpdateInterval, new MoveListener());
+		else if (!mTimer.isRunning() && isAccelerating())
+			mTimer.start();
 		
 	}
 	
