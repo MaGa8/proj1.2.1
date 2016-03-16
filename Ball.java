@@ -44,16 +44,6 @@ public class Ball
 	public Vector getPosition() { return mPosition; }
 	
 	/**
-	 * @return force currently excerted on ball
-	 */
-	public Vector getForce()
-	{
-		Vector force = mManageForce.getAcceleration().getAcceleration().clone();
-		force.scale (mMass);
-		return force;
-	}
-	
-	/**
 	 * @return ball's mass
 	 */
 	public double getMass() { return mMass; }

@@ -12,16 +12,17 @@ import javax.swing.event.*;
  */
 public class ForceManager 
 {
-	public static final double DEFAULT_FRICTION_COEFFICIENT = 0.0;
+	public static final double DEFAULT_FRICTION_COEFFICIENT = 0.1;
+	public static final double DEFAULT_MOVEMENT_THRESHOLD = 0.01;
+	public static final double GRAVITY_CONSTANT = 9.81;
+	public static final double TIME_COEFFICIENT = 0.001;
 	
 	public class MoveListener implements ActionListener
 	{
 		@Override
 		public void actionPerformed(ActionEvent e) 
 		{
-			mAcc.apply (mVeloc.getVelocity(), mUpdateInterval);
-			mVeloc.apply (mPos, mUpdateInterval);
-			applyForce (getFriction());
+			move();
 		}
 	}
 	
@@ -30,33 +31,29 @@ public class ForceManager
 	 */
 	public ForceManager (Vector pos, double mass)
 	{
-		mAcc = new Acceleration (new Vector (pos.getDimension()));
 		mVeloc = new Velocity (new Vector (pos.getDimension()));
 		mPos = pos;
 		mMass = mass;
 		mFrictionCoefficient = DEFAULT_FRICTION_COEFFICIENT;
-		mUpdateInterval = 200;
+		mMovementThreshold = DEFAULT_MOVEMENT_THRESHOLD;
+		mUpdateInterval = 20;
 		mTimer = new Timer (mUpdateInterval, new MoveListener());
 		mTimer.setRepeats (true);
 	}
 	
 	/**
-	 * @return friction proportional by current friction coefficient to
-	 * the force moving the object
+	 * @return force of friction
 	 */
 	public Force getFriction()
 	{
-		Vector fric = mAcc.getAcceleration().getOppositeVector();
-		fric.scale (mMass * mFrictionCoefficient);
-		return new Force (fric);
-	}
-	
-	/**
-	 * @return return acceleration used
-	 */
-	public Acceleration getAcceleration()
-	{
-		return mAcc;
+		ArrayList<Double> dir = new ArrayList<>();
+		Vector vel = mVeloc.getVelocity();
+		for (int cDim = 0; cDim < vel.getDimension(); ++cDim)
+			dir.add (vel.getCoordinate (cDim) == 0 ? 0 : Math.abs (vel.getCoordinate (cDim)) / vel.getCoordinate (cDim));
+		Vector vecFric = new Vector (dir);
+		vecFric.scale (-1 * mMass * GRAVITY_CONSTANT * mFrictionCoefficient);
+		
+		return new Force (vecFric);
 	}
 	
 	/**
@@ -67,12 +64,11 @@ public class ForceManager
 		return (mVeloc.getVelocity().equals (new Vector (mPos.getDimension())));
 	}
 	
-	/**
-	 * @return true if acceleration is not zero
-	 */
-	public boolean isAccelerating()
+	
+	public void move()
 	{
-		return (!mAcc.getAcceleration().equals (new Vector (mPos.getDimension())));
+		applyForce (getFriction());
+		mVeloc.apply (mPos, mUpdateInterval * TIME_COEFFICIENT);
 	}
 	
 	/**
@@ -104,7 +100,10 @@ public class ForceManager
 	 */
 	public void applyForce (Force f)
 	{
-		f.apply (mAcc.getAcceleration(), mMass);
+		Acceleration acc = new Acceleration (new Vector (mPos.getDimension()));
+		f.apply (acc.getAcceleration(), mMass);
+		acc.apply (mVeloc.getVelocity(), mUpdateInterval * TIME_COEFFICIENT);
+		applyThreshold();
 		resetTimer();
 	}
 	
@@ -122,15 +121,28 @@ public class ForceManager
 	{
 		if (mTimer.isRunning() && isStill())
 			mTimer.stop();
-		else if (!mTimer.isRunning() && isAccelerating())
+		else if (!mTimer.isRunning() && !isStill())
 			mTimer.start();
-		
 	}
 	
-	public Acceleration mAcc;
+	
+	private void applyThreshold()
+	{
+		double sumVelo = 0.0;
+		for (int cDim = 0; cDim < mPos.getDimension(); ++cDim)
+			sumVelo += mVeloc.getVelocity().getCoordinate (cDim);
+		
+		if (Math.abs (sumVelo) < mMovementThreshold)
+		{
+			for (int cDim = 0; cDim < mPos.getDimension(); ++cDim)
+				mVeloc.getVelocity().move (mVeloc.getVelocity().getOppositeVector());
+		}
+	}
+	
+	//public Acceleration mAcc;
 	public Velocity mVeloc;
 	public Vector mPos;
-	public double mMass, mFrictionCoefficient;
+	public double mMass, mFrictionCoefficient, mMovementThreshold;
 	int mUpdateInterval;
 	
 	public Timer mTimer;
