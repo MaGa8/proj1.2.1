@@ -35,7 +35,7 @@ public class ForceManager
 		mPos = pos;
 		mMass = mass;
 		mFrictionCoefficient = DEFAULT_FRICTION_COEFFICIENT;
-		mUpdateInterval = 1;
+		mUpdateInterval = 200;
 		mTimer = new Timer (mUpdateInterval, new MoveListener());
 		mTimer.setRepeats (true);
 	}
@@ -49,6 +49,14 @@ public class ForceManager
 		Vector fric = mAcc.getAcceleration().getOppositeVector();
 		fric.scale (mMass * mFrictionCoefficient);
 		return new Force (fric);
+	}
+	
+	/**
+	 * @return return acceleration used
+	 */
+	public Acceleration getAcceleration()
+	{
+		return mAcc;
 	}
 	
 	/**
@@ -73,7 +81,7 @@ public class ForceManager
 	 */
 	public void setUpdateInterval (int newUpdateInterval)
 	{
-		if (mTimer != null)
+		if (!mTimer.isRunning())
 			throw new IllegalStateException();
 		mUpdateInterval = newUpdateInterval;
 	}

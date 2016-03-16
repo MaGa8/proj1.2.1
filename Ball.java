@@ -7,6 +7,14 @@ import java.util.*;
  */
 public class Ball 
 {
+	public static class BallSetup
+	{
+		public Vector initPos;
+		public double radius;
+		public double density;
+	}
+	
+	
 	public final static double FRICTION_COEFFICIENT = 0.075;
 	
 	/**
@@ -21,9 +29,29 @@ public class Ball
 	}
 	
 	/**
+	 * @param setup setup object
+	 * initializes ball using the setup object
+	 */
+	public Ball (BallSetup setup)
+	{
+		this (setup.initPos, setup.radius, setup.density);
+	}
+	
+	
+	/**
 	 * @return internal position vector
 	 */
 	public Vector getPosition() { return mPosition; }
+	
+	/**
+	 * @return force currently excerted on ball
+	 */
+	public Vector getForce()
+	{
+		Vector force = mManageForce.getAcceleration().getAcceleration().clone();
+		force.scale (mMass);
+		return force;
+	}
 	
 	/**
 	 * @return ball's mass
