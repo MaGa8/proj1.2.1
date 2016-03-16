@@ -59,6 +59,14 @@ public class ForceManager
 	}
 	
 	/**
+	 * @return true if acceleration is not zero
+	 */
+	public boolean isAccelerating()
+	{
+		return (mAcc.getAcceleration().equals (new Vector (mPos.getDimension())));
+	}
+	
+	/**
 	 * @param newUpdateInterval set update interval to be applied once a force is applied
 	 * Precondition the object is not moving
 	 */
@@ -104,12 +112,14 @@ public class ForceManager
 	
 	private void resetTimer()
 	{
-		if (mTimer != null)
+		if (mTimer != null && isStill())
+		{
 			mTimer.stop();
-		if (!isStill())
-			mTimer = new Timer (mUpdateInterval, new MoveListener());
-		else
 			mTimer = null;
+		}
+		else if (isAccelerating())
+			mTimer = new Timer (mUpdateInterval, new MoveListener());
+		
 	}
 	
 	public Acceleration mAcc;
