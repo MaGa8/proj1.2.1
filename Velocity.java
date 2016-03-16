@@ -31,14 +31,14 @@ public class Velocity
 	}
 	
 	/**
-	 * alters acceleration depending on velocity stored
-	 * @param acceleration acceleration to alter
+	 * alters position depending on velocity stored
+	 * @param pos position to alter
 	 * @param mass mass exposed to acceleration
 	 */
-	public void apply (Vector acceleration, double mass)
+	public void apply (Vector position, double dT)
 	{
-		for (int cDim = 0; cDim < acceleration.getDimension(); ++cDim)
-			acceleration.move (cDim, mVelocity.getCoordinate (cDim) / mass);
+		for (int cDim = 0; cDim < mVelocity.getDimension(); ++cDim)
+			position.move (cDim, mVelocity.getCoordinate (cDim) * dT);
 	}
 	
 	private Vector mVelocity;
