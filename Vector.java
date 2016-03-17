@@ -1,4 +1,5 @@
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -8,8 +9,9 @@ import java.util.*;
  * static field DIGITS_ACCURACY
  * @author martin
  */
-public class Vector
+public class Vector implements Serializable
 {
+
 	/**
 	 * exception thrown on bad index
 	 * @author martin
