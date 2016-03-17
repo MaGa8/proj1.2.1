@@ -57,6 +57,19 @@ public class ForceManager
 	}
 	
 	/**
+	 * @return a clone of the current velocity vector
+	 */
+	public Vector getVelocity()
+	{
+		return mVeloc.getVelocity().clone();
+	}
+	
+	/**
+	 * @return time intervals used for calculations
+	 */
+	public double getTimeInterval() { return (mUpdateInterval * TIME_COEFFICIENT); }
+	
+	/**
 	 * @return true if velocity is zero
 	 */
 	public boolean isStill()

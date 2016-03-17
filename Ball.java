@@ -37,6 +37,10 @@ public class Ball
 		this (setup.initPos, setup.radius, setup.density);
 	}
 	
+	/**
+	 * @return force manager object applied to this ball
+	 */
+	public ForceManager obtainForceManager() { return mManageForce; }
 	
 	/**
 	 * @return internal position vector

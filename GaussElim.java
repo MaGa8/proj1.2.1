@@ -18,7 +18,7 @@ public class GaussElim implements Runnable
 	 */
 	public static void main (String[] args)
 	{
-		Matrix<Double> m = new Matrix<Double>(2, 3);
+	/*	Matrix<Double> m = new Matrix<Double>(2, 3);
 		m.setCell(0, 0, 2.0);
 		m.setCell(0, 1, 1.0);
 		m.setCell(0, 2, 32.0);
@@ -28,7 +28,7 @@ public class GaussElim implements Runnable
 		g.run();
 		g.mMat.print(System.out);
 		System.out.println ("all basic " + g.allBasicVariables());
-		System.out.println ("consistent " + g.isConsistent());
+		System.out.println ("consistent " + g.isConsistent());*/
 	}
 	
 	/**
@@ -86,6 +86,7 @@ public class GaussElim implements Runnable
 	 */
 	public GaussElim (Matrix<Double> m)
 	{
+		mFactory = m.getFactory();
 		mMat = m.clone();
 		mOrig = m.clone();
 		mPivots = findmPivots();
@@ -136,7 +137,7 @@ public class GaussElim implements Runnable
 		
 		for (int cCol = mPivots[0]; cCol < mMat.getColumns() - 1; ++cCol)
 		{
-			Matrix<Double> vec = new Matrix<Double> (mMat.getRows(), 1);
+			Matrix<Double> vec = mFactory.produce (mMat.getRows(), 1);
 			for (int cRow = 0; cRow < mMat.getRows(); ++cRow)
 			{
 				if (mPivots[cRow] < cCol && !mMat.getCell(cRow, cCol).equals(0))
@@ -146,7 +147,7 @@ public class GaussElim implements Runnable
 						vec.setCell(cDim, 0, vec.getCell (cDim, 0) + coeff * mOrig.getCell(cRow, cCol));
 				}
 			}
-			if (!vec.equals (new Matrix<Double> (mMat.getRows(), 1)))
+			if (!vec.equals (mFactory.produce (mMat.getRows(), 1)))
 				vecs.add (vec);
 		}
 		
@@ -159,7 +160,7 @@ public class GaussElim implements Runnable
 	 */
 	public Matrix<Double> getTranslationVector()
 	{
-		Matrix<Double> trans = new Matrix<Double> (mMat.getRows(), 1);
+		Matrix<Double> trans = mFactory.produce (mMat.getRows(), 1);
 		for (int cRow = 0; cRow < mMat.getRows(); ++cRow)
 			trans.setCell(cRow, 0, mMat.getCell (cRow, mMat.getColumns() - 1));
 		return trans;
@@ -379,6 +380,7 @@ public class GaussElim implements Runnable
 		}
 	}
 	
+	private MatrixFactory<Double> mFactory;
 	private Matrix<Double> mMat, mOrig;
 	private int[] mPivots;
 }

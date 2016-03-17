@@ -185,6 +185,20 @@ public class Matrix <T extends Number> implements Cloneable
 			throw new MatrixOutOfBoundsException (row + "|" + col + " out of bounds in " + getRows() + "x" + getColumns() + " matrix");
 	}
 	
+	/**
+	 * @return matrix factory initialized to helper classes contained
+	 * in this matrix
+	 */
+	public MatrixFactory<T> getFactory()
+	{
+		MatrixFactory<T> fax = new MatrixFactory<>();
+		fax.setInitializer (mInit);
+		fax.setAdditor (mAdd);
+		fax.setMultiplicator (mMulti);
+		fax.setComparator (mComp);
+		return fax;
+	}
+	
 	public String toString()
 	{
 		String s =  getRows() + "x" + getColumns() + " matrix\n[\t";
