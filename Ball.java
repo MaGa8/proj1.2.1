@@ -14,9 +14,6 @@ public class Ball
 		public double density;
 	}
 	
-	
-	public final static double FRICTION_COEFFICIENT = 0.075;
-	
 	/**
 	 * @param initPos initial position
 	 */

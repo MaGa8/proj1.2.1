@@ -10,12 +10,24 @@ import javax.swing.event.*;
  * moves object's position regularly according to time interval
  * @author martin
  */
-public class ForceManager 
+public class ForceManager extends Lock
 {
-	public static final double DEFAULT_FRICTION_COEFFICIENT = 0.1;
+	/**
+	 * default exception class of force manager
+	 * @author martin
+	 */
+	public static class ForceManagerException extends IllegalStateException
+	{
+		public ForceManagerException() {}
+		
+		public ForceManagerException (String s) { super (s); }
+	}
+	
+	public static final double DEFAULT_FRICTION_COEFFICIENT = 0.01;
 	public static final double DEFAULT_MOVEMENT_THRESHOLD = 0.01;
 	public static final double GRAVITY_CONSTANT = 9.81;
-	public static final double TIME_COEFFICIENT = 0.001;
+	public static final double TIME_COEFFICIENT = 0.1;
+	
 	
 	public class MoveListener implements ActionListener
 	{
@@ -78,10 +90,11 @@ public class ForceManager
 	}
 	
 	
-	public void move()
+	public void makeMove()
 	{
-		applyForce (getFriction());
-		mVeloc.apply (mPos, mUpdateInterval * TIME_COEFFICIENT);
+		if (!isOpen())
+			throw new LockException ("force manager is locked, cannot make move");
+		move();
 	}
 	
 	/**
@@ -90,6 +103,8 @@ public class ForceManager
 	 */
 	public void setUpdateInterval (int newUpdateInterval)
 	{
+		if (!isOpen())
+			throw new Lock.LockException ("force manager is locked, cannot change update interval");
 		if (!mTimer.isRunning())
 			throw new IllegalStateException();
 		mUpdateInterval = newUpdateInterval;
@@ -126,10 +141,14 @@ public class ForceManager
 	 */
 	public void setFriction (double newFrictionCoefficient)
 	{
+		if (!isOpen())
+			throw new LockException ("force manager is locked, cannot change friction");
 		mFrictionCoefficient = newFrictionCoefficient;
 	}
 	
-	
+	/**
+	 * starts or stops timer if necessary
+	 */
 	private void resetTimer()
 	{
 		if (mTimer.isRunning() && isStill())
@@ -138,7 +157,18 @@ public class ForceManager
 			mTimer.start();
 	}
 	
+	/**
+	 * performs actual moving
+	 */
+	private void move()
+	{
+		applyForce (getFriction());
+		mVeloc.apply (mPos, mUpdateInterval * TIME_COEFFICIENT);
+	}
 	
+	/**
+	 * sets velocity to zero if below threshold
+	 */
 	private void applyThreshold()
 	{
 		double sumVelo = 0.0;
@@ -153,10 +183,10 @@ public class ForceManager
 	}
 	
 	//public Acceleration mAcc;
-	public Velocity mVeloc;
-	public Vector mPos;
-	public double mMass, mFrictionCoefficient, mMovementThreshold;
-	int mUpdateInterval;
+	private Velocity mVeloc;
+	private Vector mPos;
+	private double mMass, mFrictionCoefficient, mMovementThreshold;
+	private int mUpdateInterval;
 	
-	public Timer mTimer;
+	private Timer mTimer;
 }
