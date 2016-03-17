@@ -118,6 +118,18 @@ public class Vector
 	public int getDimension() { return mStore.size(); }
 	
 	/**
+	 * computes magnitude
+	 * @return magnitude of this vector
+	 */
+	public double getMagnitude()
+	{
+		double mag = 0.0;
+		for (int cDim = 0; cDim < getDimension(); ++cDim)
+			mag += Math.pow (getCoordinate (cDim), 2);
+		return Math.sqrt (mag);
+	}
+	
+	/**
 	 * @param v vector to compare to this vector
 	 * @return true if v and this have the same orientation
 	 * i.e. if they have the same ratio over all coordinates

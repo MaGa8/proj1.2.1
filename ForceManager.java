@@ -89,7 +89,10 @@ public class ForceManager extends Lock
 		return (mVeloc.getVelocity().equals (new Vector (mPos.getDimension())));
 	}
 	
-	
+	/**
+	 * makes force manager apply regular move according to forces applied
+	 * @throws LockException if manager is locked
+	 */
 	public void makeMove()
 	{
 		if (!isOpen())
@@ -100,6 +103,7 @@ public class ForceManager extends Lock
 	/**
 	 * @param newUpdateInterval set update interval to be applied once a force is applied
 	 * Precondition the object is not moving
+	 * @throws LockException if manager is locked
 	 */
 	public void setUpdateInterval (int newUpdateInterval)
 	{
@@ -138,6 +142,7 @@ public class ForceManager extends Lock
 	/**
 	 * @param newFrictionCoefficient new friction coefficient
 	 * sets newFrictionCoefficient
+	 * @throws LockException if manager is locked
 	 */
 	public void setFriction (double newFrictionCoefficient)
 	{

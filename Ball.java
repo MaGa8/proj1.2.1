@@ -23,6 +23,8 @@ public class Ball
 		mRadius = radius;
 		mMass = 4 / 3 * Math.pow(mRadius, 3) * Math.PI * density;
 		mManageForce = new ForceManager (mPosition, mMass);
+		mForceManagerKey = mManageForce.getOwnership();
+		mManageForce.setOpen (false, mForceManagerKey);
 	}
 	
 	/**
@@ -66,5 +68,6 @@ public class Ball
 	
 	private Vector mPosition; 
 	private ForceManager mManageForce;
+	private Lock.Key mForceManagerKey;
 	private double mMass, mRadius;
 }
