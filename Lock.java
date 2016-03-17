@@ -46,7 +46,7 @@ public class Lock
 	/**
 	 * @return true if lock has owner
 	 */
-	public boolean hasOwner() { return (mOpener == null); }
+	public boolean hasOwner() { return (mOpener != null); }
 	
 	/**
 	 * @param opener a given key
