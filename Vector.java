@@ -203,6 +203,15 @@ public class Vector
 	}
 	
 	/**
+	 * makes this vector a unity vector
+	 */
+	public void unity()
+	{
+		double length = getMagnitude();
+		scale (1.0 / length);
+	}
+	
+	/**
 	 * @param index index of coordinate to move
 	 * @param value value to move by
 	 */

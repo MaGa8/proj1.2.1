@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 
 /**
  * class modelling a hole1
@@ -5,6 +7,9 @@
  */
 public class Hole 
 {
+	public static final double ATTRACTION = 1;
+	
+	
 	/**
 	 * parametric constructor
 	 * @param center center of the circular hole
@@ -52,9 +57,24 @@ public class Hole
 	}
 	
 	/**
+	 * @param attract ball to attract
+	 * will apply a fixed force on ball oriented towards center
+	 */
+	public void attractBall (Ball attract)
+	{
+		ArrayList<Double> distance = new ArrayList<>();
+		for (int cDim = 0; cDim < attract.getPosition().getDimension(); ++cDim)
+			distance.add (mCenter.getCoordinate (cDim) - attract.getPosition().getCoordinate(cDim));
+		Vector attraction = new Vector (distance);
+		Vector ballVelocity = attract.obtainForceManager().getVelocity();
+		attraction.scale (ATTRACTION * ballVelocity.getMagnitude() / attraction.getMagnitude());
+		attract.obtainForceManager().applyForce (new Force (attraction));
+	}
+	
+	/**
 	 * @param stop ball to stop
 	 */
-	public void putInWhole (Ball stop)
+	public void putInHole (Ball stop)
 	{
 		Vector stopForce = stop.obtainForceManager().getVelocity();
 		stopForce.scale (-1 * stop.getMass() / stop.obtainForceManager().getTimeInterval());
