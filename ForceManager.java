@@ -23,11 +23,15 @@ public class ForceManager extends Lock
 		public ForceManagerException (String s) { super (s); }
 	}
 	
-	public static final double DEFAULT_FRICTION_COEFFICIENT = 0.01;
+	public static enum FrictionType {STATIC, DYNAMIC}
+	
+	public static final double DEFAULT_STATIC_FRICTION_COEFFICIENT = 0.1;
+	public static final double DEFAULT_DYNAMIC_FRICTION_COEFFICIENT = 0.3;
 	public static final double DEFAULT_MOVEMENT_THRESHOLD = 0.01;
 	public static final double GRAVITY_CONSTANT = 9.81;
-	public static final double TIME_COEFFICIENT = 0.1;
-	
+	public static final double TIME_COEFFICIENT = 0.009;
+	public static final double RANDOMIZE_COEFFICIENT = 0.25;
+	public static final double RANDOMIZE_FREQUENCY = 0.07;
 	
 	public class MoveListener implements ActionListener
 	{
@@ -46,9 +50,10 @@ public class ForceManager extends Lock
 		mVeloc = new Velocity (new Vector (pos.getDimension()));
 		mPos = pos;
 		mMass = mass;
-		mFrictionCoefficient = DEFAULT_FRICTION_COEFFICIENT;
+		mStaticFrictionCoefficient = DEFAULT_STATIC_FRICTION_COEFFICIENT;
+		mDynamicFrictionCoefficient = DEFAULT_DYNAMIC_FRICTION_COEFFICIENT;
 		mMovementThreshold = DEFAULT_MOVEMENT_THRESHOLD;
-		mUpdateInterval = 20;
+		mUpdateInterval = 5;
 		mTimer = new Timer (mUpdateInterval, new MoveListener());
 		mTimer.setRepeats (true);
 	}
@@ -56,14 +61,19 @@ public class ForceManager extends Lock
 	/**
 	 * @return force of friction
 	 */
-	public Force getFriction()
+	public Force getFriction (FrictionType type)
 	{
 		ArrayList<Double> dir = new ArrayList<>();
 		Vector vel = mVeloc.getVelocity();
 		for (int cDim = 0; cDim < vel.getDimension(); ++cDim)
 			dir.add (vel.getCoordinate (cDim) == 0 ? 0 : Math.abs (vel.getCoordinate (cDim)) / vel.getCoordinate (cDim));
 		Vector vecFric = new Vector (dir);
-		vecFric.scale (-1 * mMass * GRAVITY_CONSTANT * mFrictionCoefficient);
+		double coefficient;
+		if (type == FrictionType.STATIC)
+			coefficient = mStaticFrictionCoefficient;
+		else
+			coefficient = mDynamicFrictionCoefficient;
+		vecFric.scale (-1 * mMass * GRAVITY_CONSTANT * coefficient);
 		
 		return new Force (vecFric);
 	}
@@ -132,9 +142,12 @@ public class ForceManager extends Lock
 	 */
 	public void applyForce (Force f)
 	{
+		boolean wasStill = isStill();
 		Acceleration acc = new Acceleration (new Vector (mPos.getDimension()));
 		f.apply (acc.getAcceleration(), mMass);
 		acc.apply (mVeloc.getVelocity(), mUpdateInterval * TIME_COEFFICIENT);
+		if (wasStill && !isStill())
+			applyForce (getFriction (FrictionType.STATIC));
 		applyThreshold();
 		resetTimer();
 	}
@@ -144,11 +157,12 @@ public class ForceManager extends Lock
 	 * sets newFrictionCoefficient
 	 * @throws LockException if manager is locked
 	 */
-	public void setFriction (double newFrictionCoefficient)
+	public void setFriction (double newStaticFrictionCoefficient, double newDynamicFrictionCoefficient)
 	{
 		if (!isOpen())
 			throw new LockException ("force manager is locked, cannot change friction");
-		mFrictionCoefficient = newFrictionCoefficient;
+		mStaticFrictionCoefficient = newStaticFrictionCoefficient;
+		mDynamicFrictionCoefficient = newDynamicFrictionCoefficient;
 	}
 	
 	/**
@@ -167,7 +181,8 @@ public class ForceManager extends Lock
 	 */
 	private void move()
 	{
-		applyForce (getFriction());
+		applyForce (getFriction (FrictionType.DYNAMIC));
+		randomizeVector (mVeloc.getVelocity());
 		mVeloc.apply (mPos, mUpdateInterval * TIME_COEFFICIENT);
 	}
 	
@@ -187,10 +202,27 @@ public class ForceManager extends Lock
 		}
 	}
 	
+	/**
+	 * @param v given vector
+	 * @return v with randomization proportional to vector's magnitude
+	 */
+	private Vector randomizeVector (Vector v)
+	{
+		Random gen = new Random();
+		if (gen.nextDouble() < RANDOMIZE_FREQUENCY)
+		{
+			double mag = v.getMagnitude();
+			for (int cDim = 0; cDim < v.getDimension(); ++cDim)
+				v.move(cDim, (gen.nextDouble() - 0.5) * mag * RANDOMIZE_COEFFICIENT);
+		}
+		return v;
+	}
+	
 	//public Acceleration mAcc;
 	private Velocity mVeloc;
 	private Vector mPos;
-	private double mMass, mFrictionCoefficient, mMovementThreshold;
+	private double mStaticFrictionCoefficient, mDynamicFrictionCoefficient;
+	private double mMass, mMovementThreshold;
 	private int mUpdateInterval;
 	
 	private Timer mTimer;

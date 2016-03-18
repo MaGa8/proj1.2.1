@@ -2,7 +2,9 @@ import java.util.ArrayList;
 
 
 /**
- * class modelling a hole1
+ * class modelling a hole
+ * a hole having a center, radius and target velocity
+ * provides utility for interaction
  * @author martin
  */
 public class Hole 
@@ -14,11 +16,14 @@ public class Hole
 	 * parametric constructor
 	 * @param center center of the circular hole
 	 * @param radius radius of the hole
+	 * sets target velocity to 0
+	 * sets attraction radius to radius
 	 */
 	public Hole (Vector center, double radius)
 	{
 		mCenter = center;
 		mRadius = radius;
+		mAttractionRadius = radius;
 		mTargetVelocity = 0.0;
 	}
 	
@@ -33,8 +38,13 @@ public class Hole
 	public double getRadius() { return mRadius; }
 	
 	/**
+	 * @return attraction radius of the hole
+	 */
+	public double getAttractionRadius() { return mAttractionRadius; }
+	
+	/**
 	 * @param check ball to check
-	 * @return true if ball is within perimeter and 
+	 * @return true if ball is within perimeter and magnitude of velocity is below target
 	 */
 	public boolean isInHole (Ball check)
 	{
@@ -47,6 +57,19 @@ public class Hole
 	}
 	
 	/**
+	 * @param check ball to check
+	 * @return true if ball is witin attraction perimeter
+	 */
+	public boolean isAttracted (Ball check)
+	{
+		Vector distToCenter = check.getPosition().clone();
+		distToCenter.move (mCenter.getOppositeVector());
+		if (distToCenter.getMagnitude() <= mAttractionRadius)
+			return true;
+		return false;
+	}
+	
+	/**
 	 * @param target new magnitude of target velocity
 	 * if ball is on hole and target velocity > velocity
 	 * ball is said to be in hole
@@ -54,6 +77,14 @@ public class Hole
 	public void setTargetVelocity (double target)
 	{
 		mTargetVelocity = target;
+	}
+	
+	/**
+	 * @param attractionRadius new attraction radius to use
+	 */
+	public void setAttractionRadius (double attractionRadius)
+	{
+		mAttractionRadius = attractionRadius;
 	}
 	
 	/**
@@ -83,5 +114,5 @@ public class Hole
 	
 	private Vector mCenter;
 	private double mTargetVelocity;
-	private double mRadius;
+	private double mRadius, mAttractionRadius;
 }
