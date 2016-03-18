@@ -25,14 +25,6 @@ public class ForceManager extends Lock
 	
 	public static enum FrictionType {STATIC, DYNAMIC}
 	
-	public static final double DEFAULT_STATIC_FRICTION_COEFFICIENT = 0.1;
-	public static final double DEFAULT_DYNAMIC_FRICTION_COEFFICIENT = 0.3;
-	public static final double DEFAULT_MOVEMENT_THRESHOLD = 0.01;
-	public static final double GRAVITY_CONSTANT = 9.81;
-	public static final double TIME_COEFFICIENT = 0.009;
-	public static final double RANDOMIZE_COEFFICIENT = 0.25;
-	public static final double RANDOMIZE_FREQUENCY = 0.07;
-	
 	public class MoveListener implements ActionListener
 	{
 		@Override
@@ -50,9 +42,9 @@ public class ForceManager extends Lock
 		mVeloc = new Velocity (new Vector (pos.getDimension()));
 		mPos = pos;
 		mMass = mass;
-		mStaticFrictionCoefficient = DEFAULT_STATIC_FRICTION_COEFFICIENT;
-		mDynamicFrictionCoefficient = DEFAULT_DYNAMIC_FRICTION_COEFFICIENT;
-		mMovementThreshold = DEFAULT_MOVEMENT_THRESHOLD;
+		mStaticFrictionCoefficient = PhysicsConstants.DEFAULT_STATIC_FRICTION_COEFFICIENT;
+		mDynamicFrictionCoefficient = PhysicsConstants.DEFAULT_DYNAMIC_FRICTION_COEFFICIENT;
+		mMovementThreshold = PhysicsConstants.DEFAULT_MOVEMENT_THRESHOLD;
 		mUpdateInterval = 5;
 		mTimer = new Timer (mUpdateInterval, new MoveListener());
 		mTimer.setRepeats (true);
@@ -73,7 +65,7 @@ public class ForceManager extends Lock
 			coefficient = mStaticFrictionCoefficient;
 		else
 			coefficient = mDynamicFrictionCoefficient;
-		vecFric.scale (-1 * mMass * GRAVITY_CONSTANT * coefficient);
+		vecFric.scale (-1 * mMass * PhysicsConstants.GRAVITY_CONSTANT * coefficient);
 		
 		return new Force (vecFric);
 	}
@@ -89,7 +81,7 @@ public class ForceManager extends Lock
 	/**
 	 * @return time intervals used for calculations
 	 */
-	public double getTimeInterval() { return (mUpdateInterval * TIME_COEFFICIENT); }
+	public double getTimeInterval() { return (mUpdateInterval * PhysicsConstants.TIME_COEFFICIENT); }
 	
 	/**
 	 * @return true if velocity is zero
@@ -145,7 +137,7 @@ public class ForceManager extends Lock
 		boolean wasStill = isStill();
 		Acceleration acc = new Acceleration (new Vector (mPos.getDimension()));
 		f.apply (acc.getAcceleration(), mMass);
-		acc.apply (mVeloc.getVelocity(), mUpdateInterval * TIME_COEFFICIENT);
+		acc.apply (mVeloc.getVelocity(), mUpdateInterval * PhysicsConstants.TIME_COEFFICIENT);
 		if (wasStill && !isStill())
 			applyForce (getFriction (FrictionType.STATIC));
 		applyThreshold();
@@ -183,7 +175,7 @@ public class ForceManager extends Lock
 	{
 		applyForce (getFriction (FrictionType.DYNAMIC));
 		randomizeVector (mVeloc.getVelocity());
-		mVeloc.apply (mPos, mUpdateInterval * TIME_COEFFICIENT);
+		mVeloc.apply (mPos, mUpdateInterval * PhysicsConstants.TIME_COEFFICIENT);
 	}
 	
 	/**
@@ -209,11 +201,11 @@ public class ForceManager extends Lock
 	private Vector randomizeVector (Vector v)
 	{
 		Random gen = new Random();
-		if (gen.nextDouble() < RANDOMIZE_FREQUENCY)
+		if (gen.nextDouble() < PhysicsConstants.RANDOMIZE_FREQUENCY)
 		{
 			double mag = v.getMagnitude();
 			for (int cDim = 0; cDim < v.getDimension(); ++cDim)
-				v.move(cDim, (gen.nextDouble() - 0.5) * mag * RANDOMIZE_COEFFICIENT);
+				v.move(cDim, (gen.nextDouble() - 0.5) * mag * PhysicsConstants.RANDOMIZE_COEFFICIENT);
 		}
 		return v;
 	}

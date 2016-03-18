@@ -52,6 +52,14 @@ public class Ball
 	public double getMass() { return mMass; }
 	
 	/**
+	 * @return ball's surface
+	 */
+	public double getSurface() 
+	{
+		return (4 * Math.PI * Math.pow (getRadius(), 2));
+	}
+	
+	/**
 	 * @return radius of the ball
 	 */
 	public double getRadius() { return mRadius; }
