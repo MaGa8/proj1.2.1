@@ -17,6 +17,8 @@ public class PhysicsConstants
 	public static final double RANDOMIZE_COEFFICIENT = 0.25;
 	public static final double RANDOMIZE_FREQUENCY = 0.07;
 	
+	public static final double HOLE_ATTRACTION = 1;
+	
 	public static final double WIND_COEFFICIENT = 0.5;
 	
 }
