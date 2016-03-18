@@ -58,13 +58,13 @@ public class Hole
 	
 	/**
 	 * @param check ball to check
-	 * @return true if ball is witin attraction perimeter
+	 * @return true if ball is witin attraction perimeter and outside of the hole's perimeter
 	 */
 	public boolean isAttracted (Ball check)
 	{
 		Vector distToCenter = check.getPosition().clone();
 		distToCenter.move (mCenter.getOppositeVector());
-		if (distToCenter.getMagnitude() <= mAttractionRadius)
+		if (distToCenter.getMagnitude() <= mAttractionRadius && distToCenter.getMagnitude() > mRadius)
 			return true;
 		return false;
 	}
@@ -90,26 +90,33 @@ public class Hole
 	/**
 	 * @param attract ball to attract
 	 * will apply a fixed force on ball oriented towards center
+	 * if isAttracted is true
 	 */
 	public void attractBall (Ball attract)
 	{
-		ArrayList<Double> distance = new ArrayList<>();
-		for (int cDim = 0; cDim < attract.getPosition().getDimension(); ++cDim)
-			distance.add (mCenter.getCoordinate (cDim) - attract.getPosition().getCoordinate(cDim));
-		Vector attraction = new Vector (distance);
-		Vector ballVelocity = attract.obtainForceManager().getVelocity();
-		attraction.scale (ATTRACTION * ballVelocity.getMagnitude() / attraction.getMagnitude());
-		attract.obtainForceManager().applyForce (new Force (attraction));
+		if (isAttracted (attract))
+		{
+			ArrayList<Double> distance = new ArrayList<>();
+			for (int cDim = 0; cDim < attract.getPosition().getDimension(); ++cDim)
+				distance.add (mCenter.getCoordinate (cDim) - attract.getPosition().getCoordinate(cDim));
+			Vector attraction = new Vector (distance);
+			attraction.scale (ATTRACTION * attract.getMass() / attraction.getMagnitude());
+			attract.obtainForceManager().applyForce (new Force (attraction));
+		}
 	}
 	
 	/**
 	 * @param stop ball to stop
+	 * stops the ball is isInHole is true
 	 */
 	public void putInHole (Ball stop)
 	{
-		Vector stopForce = stop.obtainForceManager().getVelocity();
-		stopForce.scale (-1 * stop.getMass() / stop.obtainForceManager().getTimeInterval());
-		stop.obtainForceManager().applyForce (new Force (stopForce));
+		if (isInHole (stop))
+		{
+			Vector stopForce = stop.obtainForceManager().getVelocity();
+			stopForce.scale (-1 * stop.getMass() / stop.obtainForceManager().getTimeInterval());
+			stop.obtainForceManager().applyForce (new Force (stopForce));
+		}
 	}
 	
 	private Vector mCenter;
