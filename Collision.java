@@ -30,7 +30,6 @@ public class Collision{
                 double xCordObstacle = checkVector.getCoordinate(0);
                 double yCordObstacle = checkVector.getCoordinate(1);
 
-                if (xCordBall >= xCordObstacle)
                 if (xCordBall + gameBall.getRadius() >= xCordObstacle && 
                 	xCordBall - gameBall.getRadius() <= (xCordObstacle + toCheck.getWidth()) &&
                 	yCordBall + gameBall.getRadius() >= yCordObstacle && 
